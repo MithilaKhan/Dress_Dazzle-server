@@ -1,15 +1,18 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
+require('dotenv').config()
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion ,ObjectId } = require('mongodb');
+
 
 // middleware 
 app.use(cors())
 app.use(express.json());
 
-const uri = "mongodb+srv://dress-dazzle:5jlEl3qpDCpMVbay@cluster0.1n864lk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_NAME}:${process.env.DB_PASSWORD}@cluster0.1n864lk.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
+console.log(uri);
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
   serverApi: {
@@ -33,6 +36,13 @@ async function run() {
             res.send(result)
         })
 
+        app.get("/products/:id" , async(req ,res)=>{
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) };
+            const result = await productCollection.findOne(query);
+            res.send(result);
+        })
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
@@ -44,12 +54,10 @@ async function run() {
 run().catch(console.dir);
 
 app.get('/', (req, res) => {
-  res.send('Hello World!')
+  res.send('Welcome to DressDazzle')
 })
 
 app.listen(port, () => {
     console.log(`Dress dazzle on port ${port}`);
   });
 
-//   
-// 5jlEl3qpDCpMVbay 
